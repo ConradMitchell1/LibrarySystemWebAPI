@@ -1,0 +1,73 @@
+﻿<h1> Borrowed Books </h1>
+
+<div id="userContainer">
+    <p>Loading user details...</p>
+</div>
+
+@section Scripts {
+    <script>
+        const apiBase = '/api/book/borrowed';
+        const container = document.getElementById('userContainer');
+        async function fetchUserLoans(){
+            const response = await fetch(apiBase, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if(!response.ok){
+                container.innerHTML = '<p>Error loading books.</p>';
+                return;
+            }
+
+            const books = await response.json();
+            if(!books || books.length === 0){
+                container.innerHTML = '<p>No books available.</p>';
+                return;
+            }
+            const table = `
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Borrowed Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                ${books.map(book => `
+                    <tr>
+                        <td>${book.title}</td>
+                        <td>${book.author}</td>
+                        <td>${book.borrowedDate}</td>
+                        <td>
+                            <button class="returnBtn btn btn-danger btn-sm" data-id="${book.bookId}">Return</button>
+                        </td>
+                    </tr>
+                `).join('')}
+                </tbody>
+            </table>
+             `;
+             container.innerHTML = table;
+
+             const borrowButtons = document.querySelectorAll('.returnBtn');
+             borrowButtons.forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const bookId = e.target.getAttribute('data-id');
+                    const borrowResponse = await fetch(`/api/book/return/${bookId}`, {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    if(borrowResponse.ok){
+                        alert('Book Returned successfully!');
+                        fetchUserLoans(); // Refresh the book list
+                    } else {
+                        alert('Error returning book.');
+                    }
+                });
+             });
+
+
+        }
+        fetchUserLoans();
+    </script>
+}

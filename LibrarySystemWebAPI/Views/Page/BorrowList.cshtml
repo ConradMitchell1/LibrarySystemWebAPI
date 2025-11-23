@@ -1,0 +1,51 @@
+﻿@{
+    ViewData["Title"] = "Borrowers";
+    var bookId = (int)ViewBag.BookId;
+}
+<h1> Borrowers for Book @bookId </h1>
+
+<div id="usersBorrowedContainer">
+    <p>Loading users..</p>
+</div>
+
+@section Scripts {
+    <script>
+        const bookId = @bookId;
+        const apiBase = `/api/book/find-books/${bookId}`;
+        const container = document.getElementById('usersBorrowedContainer');
+        async function fetchUsersBorrowed(){
+            const response = await fetch(apiBase, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if(!response.ok){
+                container.innerHTML = '<p>Error loading users.</p>';
+                return;
+            }
+
+            const users = await response.json();
+            if(!users || users.length === 0){
+                container.innerHTML = '<p>No users available.</p>';
+                return;
+            }
+            const table = `
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                ${users.map(user => `
+                    <tr>
+                        <td>${user.userName}</td>
+                    </tr>
+                `).join('')}
+                </tbody>
+            </table>
+             `;
+             container.innerHTML = table;
+        }
+        fetchUsersBorrowed();
+    </script>
+}

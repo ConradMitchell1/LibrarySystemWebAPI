@@ -1,0 +1,32 @@
+﻿<form id="signupForm">
+    <label>Username:</label>
+    <input type="text" name="username" />
+
+    <label>Password:</label>
+    <input type="password" name="password" />
+
+    <button type="submit">Sign Up</button>
+</form>
+
+@section Scripts {
+    <script>
+        const apiLogin = '/api/Auth/signup'
+        document.getElementById('signupForm').addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+
+            const response = await fetch(apiLogin, {
+                method: 'POST',
+                body: formData
+            });
+            if(response.ok){
+                window.location.href = '/Page/Index';
+            }
+            else{
+                const err = await response.text();
+                alert('upload failed ' + err)
+            }
+        });
+    </script>
+}

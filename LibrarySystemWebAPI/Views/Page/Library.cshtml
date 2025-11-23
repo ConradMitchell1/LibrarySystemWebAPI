@@ -1,0 +1,131 @@
+﻿<h1> Library </h1>
+<form id="searchForm" class="mb-3">
+    <div class="input-group">
+        <input id="searchInput" type="text" class="form-control" placeholder="Search books..."/>
+        <select id="searchType" class="form-select" style="max-width: 140px;">
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+        </select>
+
+        <button class="btn btn-primary" type="submit">Search</button>
+        <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+            Clear
+        </button>
+    </div>
+</form>
+<div id="booksContainer"> 
+    <p>Loading books..</p>
+</div>
+
+@section Scripts {
+    <script>
+        const apiBase = '/api/book/available';
+        const container = document.getElementById('booksContainer');
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const searchType = document.getElementById('searchType');
+        const clearBtn = document.getElementById('clearSearch');
+        function renderBooks(books) {
+            if(!books || books.length === 0){
+                container.innerHTML = '<p>No books available.</p>';
+                return;
+            }
+            const table = `
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>CopiesAvailable</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                ${books.map(book => `
+                    <tr>
+                        <td>${book.title}</td>
+                        <td>${book.author}</td>
+                        <td>${book.isbn}</td>
+                        <td>${book.copiesAvailable}</td>
+                        <td>
+                            <button class="borrowBtn btn btn-danger btn-sm" data-id="${book.id}">Borrow</button>
+                        </td>
+                    </tr>
+                `).join('')}
+                </tbody>
+            </table>
+             `;
+             container.innerHTML = table;
+
+             const borrowButtons = document.querySelectorAll('.borrowBtn');
+             borrowButtons.forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const bookId = e.target.getAttribute('data-id');
+                    const borrowResponse = await fetch(`/api/book/borrow/${bookId}`, {
+                        method: 'POST',
+                        credentials: 'include'
+                    });
+                    if(borrowResponse.ok){
+                        alert('Book borrowed successfully!');
+                        fetchBooks(); // Refresh the book list
+                    } else {
+                        alert('Error borrowing book.');
+                    }
+                });
+             });
+
+        }
+        async function fetchBooks(){
+            const response = await fetch(apiBase, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if(!response.ok){
+                container.innerHTML = '<p>Error loading books.</p>';
+                return;
+            }
+
+            const books = await response.json();
+            renderBooks(books);
+
+             
+
+            
+        }
+
+        async function searchBooks(query, type) {
+            if(!query){
+                await fetchBooKs();
+                return;
+            }
+
+            const endpoint = type === 'author' ? `/api/book/search/author?q=${encodeURIComponent(query)}`
+                                    : `/api/book/search/title?q=${encodeURIComponent(query)}`;
+            container.innerHTML = '<p>Searching books...</p>';
+            const response = await fetch(endpoint, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if(!response.ok){
+                container.innerHTML = '<p>Error searching books.</p>';
+                return;
+            }
+            const books = await response.json();
+            renderBooks(books);
+        }
+
+        searchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const query = searchInput.value.trim();
+            const type = searchType.value;
+            await searchBooks(query, type);
+        });
+
+        clearBtn.addEventListener('click', async () => {
+            searchInput.value = '';
+            await fetchBooks();
+        });
+        fetchBooks();
+    </script>
+}

@@ -1,0 +1,98 @@
+﻿<h1>Top Borrowed Books</h1>
+
+<div class="row">
+    <div class="col-md-8" style="width:500px; height: 300px;">
+        <canvas id="topBorrowedChart"></canvas>
+    </div>
+</div>
+
+<div id="chartError" class="text-danger mt-3"></div>
+
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const apiUrl = '/api/book/top-borrowed';
+        const ctx = document.getElementById('topBorrowedChart').getContext('2d');
+        const errorDiv = document.getElementById('chartError');
+        
+        async function loadTopBorrowedChart() {
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                if (!response.ok) {
+                    errorDiv.textContent = 'Error loading top borrowed books data.';
+                    return;
+                }
+
+                const books = await response.json();
+                if (!books || books.length === 0) {
+                    errorDiv.textContent = 'No data available for top borrowed books.';
+                    return;
+                }
+                const labels = books.map(book => book.title);
+                const data = books.map(book => book.borrowCount);
+                const backgroundColors = books.map(b => b.chartColor);
+                const borderColors = books.map(b => b.chartBorderColor);
+                const maxBorrowed = Math.max(...data);
+                const suggestedMax = maxBorrowed + 4;
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Times Borrowed',
+                            data: data,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 1.5,
+                            
+                            barThickness: 80
+                        }]
+                    },
+                    options: {
+                        responsive:true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max:suggestedMax,
+                                ticks:{
+                                    stepSize: 1
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Number of Times Borrowed'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Book'
+                                },
+                                categoryPercentage: 0.3,
+                                barPercentage: 0.6,
+                            }
+                            
+                        },
+                        plugins: {
+                                legend:{
+                                    display: true
+                                },
+                                tooltip: {
+                                    enabled: true
+                                }
+                        }
+                    }
+                });
+            } catch(err) {
+                console.error(err);
+                errorDiv.textContent = 'An unexpected error occurred while loading the chart.';
+            }
+        }
+        loadTopBorrowedChart();
+    </script>
+}

@@ -1,0 +1,59 @@
+﻿<h1> All Books </h1>
+<a class="nav-link text-dark" asp-area="" asp-controller="Page" asp-action="TopBorrowed">Top Borrowed Books</a>
+<div id="booksContainer">
+    <p>Loading books..</p>
+</div>
+
+@section Scripts {
+    <script>
+        const apiBase = '/api/book/all-books';
+        const container = document.getElementById('booksContainer');
+        async function fetchBooKs(){
+            const response = await fetch(apiBase, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            if(!response.ok){
+                container.innerHTML = '<p>Error loading books.</p>';
+                return;
+            }
+
+            const books = await response.json();
+            if(!books || books.length === 0){
+                container.innerHTML = '<p>No books available.</p>';
+                return;
+            }
+            const table = `
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>ISBN</th>
+                        <th>CopiesAvailable</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                ${books.map(book => `
+                    <tr>
+                        <td>${book.title}</td>
+                        <td>${book.author}</td>
+                        <td>${book.isbn}</td>
+                        <td>${book.copiesAvailable}</td>
+                        <td>
+                                <a class="btn btn-primary btn-sm" href="/Page/BorrowList/${book.id}">
+                                    View
+                                </a>
+                        </td>
+                    </tr>
+                `).join('')}
+                </tbody>
+            </table>
+             `;
+             container.innerHTML = table;
+
+        }
+        fetchBooKs();
+    </script>
+}

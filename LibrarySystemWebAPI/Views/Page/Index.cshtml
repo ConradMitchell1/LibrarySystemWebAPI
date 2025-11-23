@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a class="nav-link text-dark" href="#" onclick="logout(event)">Logout</a>
+    }
+    else
+    {
+        <a class="nav-link text-dark" asp-area="" asp-controller="Page" asp-action="Login">Login</a>
+        <a class="nav-link text-dark" asp-area="" asp-controller="Page" asp-action="Signup">Sign Up</a>
+    }
+    
+</div>
+@section Scripts{
+    <script>
+        async function logout(e){
+            e.preventDefault();
+            await fetch('/api/Auth/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            window.location.reload();
+
+        }
+    </script>
+}
