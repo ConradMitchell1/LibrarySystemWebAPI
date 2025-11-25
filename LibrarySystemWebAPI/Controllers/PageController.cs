@@ -39,6 +39,18 @@ namespace LibrarySystemWebAPI.Controllers
             return View();
         }
         [Authorize(Roles = "Admin")]
+        public IActionResult EditBook(int id)
+        {
+            ViewBag.BookId = id;
+            return View();
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult AddBook()
+        {
+            return View();
+        }
+        [Authorize(Roles = "Admin")]
         public IActionResult TopBorrowed()
         {
             return View();

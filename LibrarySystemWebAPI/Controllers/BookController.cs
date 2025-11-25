@@ -122,7 +122,14 @@ namespace LibrarySystemWebAPI.Controllers
         // Admin-Specific actions
         // ------------------------------
 
-        
+        [HttpGet("find-book/{id:int}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<Book>> FindBook(int id)
+        {
+            var book = await _bookService.GetByIdAsync(id);
+            return Ok(book);
+        }
+
         [HttpGet("top-borrowed")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Book>>> GetTopBorrowedBooks()
@@ -137,9 +144,9 @@ namespace LibrarySystemWebAPI.Controllers
             return Ok(await _bookService.GetAllAsync());
         }
 
-        [HttpPost]
+        [HttpPost("add-book")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Book>> AddBookAsync([FromBody] BookDTO newBook)
+        public async Task<ActionResult<Book>> AddBookAsync([FromForm] BookDTO newBook)
         {
             await _bookService.AddAsync(newBook);
             return CreatedAtAction(nameof(GetAvailableBooks), null);
@@ -147,7 +154,7 @@ namespace LibrarySystemWebAPI.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateBookAsync(int id, BookDTO updatedBook)
+        public async Task<IActionResult> UpdateBookAsync(int id, [FromForm] BookDTO updatedBook)
         {
             await _bookService.UpdateAsync(id, updatedBook);
             return NoContent();

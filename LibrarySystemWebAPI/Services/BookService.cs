@@ -162,5 +162,11 @@ namespace LibrarySystemWebAPI.Services
                 Password = ""
             });
         }
+
+        public async Task<Book> GetByIdAsync(int id)
+        {
+            var book = await _bookRepository.GetBookAsync(id);
+            return book;
+        }
     }
 }

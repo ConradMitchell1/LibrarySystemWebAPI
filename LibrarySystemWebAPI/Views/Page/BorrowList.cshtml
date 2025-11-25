@@ -2,6 +2,10 @@
     ViewData["Title"] = "Borrowers";
     var bookId = (int)ViewBag.BookId;
 }
+<div>
+    <button class="DeleteBook" data-id="@bookId">Delete</button>
+    <button class="EditBook" data-id="@bookId">Edit</button>
+</div>
 <h1> Borrowers for Book @bookId </h1>
 
 <div id="usersBorrowedContainer">
@@ -12,6 +16,30 @@
     <script>
         const bookId = @bookId;
         const apiBase = `/api/book/find-books/${bookId}`;
+        document.addEventListener("click", async (e) => {
+            if(e.target.classList.contains("DeleteBook")){
+                const bookId = e.target.getAttribute('data-id');
+                if(!confirm(`Delete book #${bookId}?`)) return;
+
+                const response = await fetch(`/api/book/${bookId}`,{
+                    method: 'DELETE',
+                    credentials: 'include'
+                });
+                if(response.ok){
+                    alert('Book deleted successfully.');
+                    window.location.href = '/Page/Dashboard';
+                } else {
+                    alert('Error deleting book.');
+                }
+                return;
+            }
+            if(e.target.classList.contains("EditBook")){
+                const bookId = e.target.getAttribute('data-id');
+                window.location.href = `/Page/EditBook/${bookId}`;
+                return;
+            }
+            
+        })
         const container = document.getElementById('usersBorrowedContainer');
         async function fetchUsersBorrowed(){
             const response = await fetch(apiBase, {
