@@ -19,14 +19,6 @@ namespace LibrarySystemWebAPI.Controllers
         {
             return View();
         }
-        public IActionResult Login()
-        {
-            return View();
-        }
-        public IActionResult Signup()
-        {
-            return View();
-        }
         [Authorize(Roles = "User,Admin")]
         public IActionResult Library()
         {
@@ -36,18 +28,6 @@ namespace LibrarySystemWebAPI.Controllers
         public IActionResult BorrowList(int id)
         {
             ViewBag.BookId = id;
-            return View();
-        }
-        [Authorize(Roles = "Admin")]
-        public IActionResult EditBook(int id)
-        {
-            ViewBag.BookId = id;
-            return View();
-        }
-
-        [Authorize(Roles = "Admin")]
-        public IActionResult AddBook()
-        {
             return View();
         }
         [Authorize(Roles = "Admin")]

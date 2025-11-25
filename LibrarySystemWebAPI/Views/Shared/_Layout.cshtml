@@ -36,17 +36,24 @@
                                     <a class="nav-link text-dark" asp-area="" asp-controller="Page" asp-action="UserAccount">User</a>
                                 </li>
                             }
+
                             
                         }
-                        
-                        else
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Page" asp-action="Login">Login</a>
-                            </li>
-                        }
+
                         
                     </ul>
+
+                    <div class="d-flex ms-auto">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <button class="btn btn-primary m-1" id="logoutBtn">Logout</button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-primary m-1" id="loginBtn">Login</button>
+                            <button class="btn btn-primary m-1" id="signupBtn">Sign Up</button>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
@@ -65,6 +72,158 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+    <div class="modal fade" id="loginModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Log in</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="logUsername">Username</label>
+                        <input type="text" class="form-control" id="logUsername" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="logPassword">Password</label>
+                        <input type="password" class="form-control" id="logPassword" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="logBtn">Log In</button>
+                </div>
+
+
+            </div>
+        </div>
+
+
+    </div>
+    <div class="modal fade" id="signupModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Signup</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="signUsername">Username</label>
+                        <input type="text" class="form-control" id="signUsername" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="signPassword">Password</label>
+                        <input type="password" class="form-control" id="signPassword" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="signBtn">Log In</button>
+                </div>
+
+
+            </div>
+        </div>
+
     @await RenderSectionAsync("Scripts", required: false)
+        <script>
+            async function logout(){
+                await fetch('/api/Auth/logout', {
+                    method: 'POST',
+                    credentials: 'include'
+                });
+                window.location.reload();
+
+            }
+
+            async function login(){
+                const apiLogin = '/api/Auth/login'
+                const payload = {
+                    username: document.getElementById("logUsername").value,
+                    password: document.getElementById("logPassword").value
+                };
+                const response = await fetch(apiLogin, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload),
+                });
+                if(!response.ok){
+                    const text = await response.text();
+                    alert('Error Loggin in: ' + text);
+                    return;
+                }
+                $('#loginModal').modal('hide');
+                window.location.reload();
+            }
+
+            async function signup(){
+                const apiLogin = '/api/Auth/signup'
+                const payload = {
+                    username: document.getElementById("signUsername").value,
+                    password: document.getElementById("signPassword").value
+                };
+                const response = await fetch(apiLogin, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload),
+                });
+                if(!response.ok){
+                    const text = await response.text();
+                    alert('Error Signing Up: ' + text);
+                    return;
+                }
+                $('#signupModal').modal('hide');
+                window.location.reload();
+            }
+
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const loginButton = document.getElementById('loginBtn');
+                if(loginButton){
+                    loginButton.addEventListener('click', () => {
+                        $('#loginModal').modal('show');
+                    });
+                }
+
+                const signupButton = document.getElementById('signupBtn');
+                if(signupButton){
+                    signupButton.addEventListener('click', () => {
+                        $('#signupModal').modal('show');
+                    });
+                }
+
+                const logoutBtn = document.getElementById('logoutBtn');
+                if(logoutBtn){
+                    logoutBtn.addEventListener('click', logout);
+                }
+                const logBtn = document.getElementById('logBtn');
+                if (logBtn) {
+                    logBtn.addEventListener('click', login);
+                }
+
+                const signBtn = document.getElementById('signBtn');
+                if (signBtn) {
+                    signBtn.addEventListener('click', signup);
+                }
+            });
+        </script>
+
+
 </body>
+
 </html>
+
+

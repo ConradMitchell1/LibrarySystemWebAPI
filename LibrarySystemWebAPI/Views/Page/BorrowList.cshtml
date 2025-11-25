@@ -2,10 +2,7 @@
     ViewData["Title"] = "Borrowers";
     var bookId = (int)ViewBag.BookId;
 }
-<div>
-    <button class="DeleteBook" data-id="@bookId">Delete</button>
-    <button class="EditBook" data-id="@bookId">Edit</button>
-</div>
+<button class="DeleteBook btn btn-primary m-1" data-id="@bookId">Delete</button>
 <h1> Borrowers for Book @bookId </h1>
 
 <div id="usersBorrowedContainer">

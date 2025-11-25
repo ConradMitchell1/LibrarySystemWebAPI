@@ -146,7 +146,7 @@ namespace LibrarySystemWebAPI.Controllers
 
         [HttpPost("add-book")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<Book>> AddBookAsync([FromForm] BookDTO newBook)
+        public async Task<ActionResult<Book>> AddBookAsync([FromBody] BookDTO newBook)
         {
             await _bookService.AddAsync(newBook);
             return CreatedAtAction(nameof(GetAvailableBooks), null);
@@ -154,7 +154,7 @@ namespace LibrarySystemWebAPI.Controllers
 
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateBookAsync(int id, [FromForm] BookDTO updatedBook)
+        public async Task<IActionResult> UpdateBookAsync(int id, [FromBody] BookDTO updatedBook)
         {
             await _bookService.UpdateAsync(id, updatedBook);
             return NoContent();

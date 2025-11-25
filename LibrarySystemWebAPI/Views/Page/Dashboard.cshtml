@@ -1,8 +1,88 @@
 ﻿<h1> All Books </h1>
 <a class="btn btn-primary m-1" asp-area="" asp-controller="Page" asp-action="TopBorrowed">Top Borrowed Books</a>
-<a class="btn btn-primary m-1" asp-area="" asp-controller="Page" asp-action="AddBook">Add Books</a>
+<button class="btn btn-primary m-1" id="addBookBtn">Add Book</button>
 <div id="booksContainer">
     <p>Loading books..</p>
+</div>
+<div class="modal fade" id="editBookModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Book</h5>
+                <button type="button" class="close" data-bs-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Id -->
+                <input type="hidden" id="editBookId" />
+                <div class="form-group">
+                    <label for="editTitle">Title</label>
+                    <input type="text" class="form-control" id="editTitle" />
+                </div>
+
+                <div class="form-group">
+                    <label for="editAuthor">Author</label>
+                    <input type="text" class="form-control" id="editAuthor" />
+                </div>
+                <div class="form-group">
+                    <label for="editIsbn">ISBN</label>
+                    <input type="text" class="form-control" id="editIsbn" />
+                </div>
+                <div class="form-group">
+                    <label for="editCopies">Copies Available</label>
+                    <input type="text" class="form-control" id="editCopies" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveEditBtn">Save changes</button>
+            </div>
+
+            
+        </div>
+    </div>
+
+    
+</div>
+<div class="modal fade" id="addBookModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Book</h5>
+                <button type="button" class="close" data-bs-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="addTitle">Title</label>
+                    <input type="text" class="form-control" id="addTitle" />
+                </div>
+
+                <div class="form-group">
+                    <label for="addAuthor">Author</label>
+                    <input type="text" class="form-control" id="addAuthor" />
+                </div>
+                <div class="form-group">
+                    <label for="addIsbn">ISBN</label>
+                    <input type="text" class="form-control" id="addIsbn" />
+                </div>
+                <div class="form-group">
+                    <label for="addCopies">Copies Available</label>
+                    <input type="text" class="form-control" id="addCopies" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveAddBtn">Add Book</button>
+            </div>
+
+            
+        </div>
+    </div>
+
+    
 </div>
 
 @section Scripts {
@@ -46,6 +126,14 @@
                                 <a class="btn btn-primary btn-sm" href="/Page/BorrowList/${book.id}">
                                     View
                                 </a>
+                                <button type="button" class="editBtn"
+                                    data-id="${book.id}"
+                                    data-title="${book.title}"
+                                    data-author="${book.author}"
+                                    data-isbn="${book.isbn}"
+                                    data-copies="${book.copiesAvailable}">
+                                        Edit
+                                </button>
                         </td>
                     </tr>
                 `).join('')}
@@ -53,8 +141,90 @@
             </table>
              `;
              container.innerHTML = table;
+             wireUpEditButtons();
+        }
+        const addButton = document.getElementById('addBookBtn');
+        addButton.addEventListener('click', () => {
+            $('#addBookModal').modal('show');
+        });
+        function wireUpEditButtons(){
+            const editButtons = document.querySelectorAll('.editBtn');
+            editButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    document.getElementById('editBookId').value = button.getAttribute('data-id');
+                    document.getElementById('editTitle').value = button.getAttribute('data-title');
+                    document.getElementById('editAuthor').value = button.getAttribute('data-author');
+                    document.getElementById('editIsbn').value = button.getAttribute('data-isbn');
+                    document.getElementById('editCopies').value = button.getAttribute('data-copies');
+                    $('#editBookModal').modal('show');
+                });
+            });
 
         }
-        fetchBooKs();
+
+        async function saveBookChanges() {
+            const bookId = document.getElementById('editBookId').value;
+            const payload = {
+                title: document.getElementById('editTitle').value,
+                author: document.getElementById('editAuthor').value,
+                isbn: document.getElementById('editIsbn').value,
+                copiesAvailable: parseInt(document.getElementById('editCopies').value)
+
+            }
+            const response = await fetch(`/api/book/${bookId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload),
+                credentials: 'include',
+            });
+            if(!response.ok){
+                const text = await response.text();
+                alert('Error saving changes: ' + text);
+                return;
+
+            }
+            $('#editBookModal').modal('hide');
+            fetchBooKs();
+        }
+        async function addNewBook(){
+            const payload = {
+                title: document.getElementById('addTitle').value,
+                author: document.getElementById('addAuthor').value,
+                isbn: document.getElementById('addIsbn').value,
+                copiesAvailable: parseInt(document.getElementById('addCopies').value)
+            }
+            const response = await fetch('/api/book/add-book', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload),
+                credentials: 'include',
+            });
+            if(!response.ok){
+                const text = await response.text();
+                alert('Error adding book: ' + text);
+                return;
+            }
+            $('#addBookModal').modal('hide');
+            fetchBooKs();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const addBtn = document.getElementById('saveAddBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', addNewBook);
+            }
+
+            const saveBtn = document.getElementById('saveEditBtn');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', saveBookChanges);
+            }
+
+            // Initial load
+            fetchBooKs();
+        });
     </script>
 }

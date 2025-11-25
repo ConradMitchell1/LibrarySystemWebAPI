@@ -23,7 +23,7 @@ namespace LibrarySystemWebAPI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromForm] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
             var result = await _authService.LoginAsync(request.UserName, request.Password);
 
@@ -54,7 +54,7 @@ namespace LibrarySystemWebAPI.Controllers
             return Ok("Logged out successfully.");
         }
         [HttpPost("signup")]
-        public async Task<IActionResult> Signup([FromForm] UserDTO request)
+        public async Task<IActionResult> Signup([FromBody] UserDTO request)
         {
             // Call the signup method from the auth service
             var result = await _authService.SignUpAsync(request.UserName, request.Password);
