@@ -23,6 +23,7 @@ namespace LibrarySystemWebAPI.Data
                 .SingleOrDefaultAsync(bl => bl.BookId == bookId && bl.UserId == userId && bl.ReturnDate == null);
         }
 
+        // Find all active loans for a specific user
         public async Task<IEnumerable<BookLoan>> GetLoansByUserAsync(int userId)
         {
             var bookLoans = await _db.BookLoans
@@ -32,6 +33,7 @@ namespace LibrarySystemWebAPI.Data
             return bookLoans;
         }
 
+        // Find all users who have currently borrowed a specific book
         public async Task<IEnumerable<User>> FindUsersByBookAsync(int bookId)
         {
             var users = await _db.BookLoans
@@ -43,6 +45,7 @@ namespace LibrarySystemWebAPI.Data
             return users;
         }
 
+        // Check if a specific book is currently borrowed by a specific user
         public Task<bool> IsBookBorrowedAsync(int bookId, int userId)
         {
             return _db.BookLoans.AnyAsync(l => l.BookId == bookId && l.UserId == userId && l.ReturnDate == null);
@@ -51,7 +54,6 @@ namespace LibrarySystemWebAPI.Data
         public async Task SaveAsync()
         {
             await _db.SaveChangesAsync();
-            int x = Convert.ToInt32("32");
         }
     }
 }

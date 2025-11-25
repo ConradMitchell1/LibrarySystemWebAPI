@@ -27,10 +27,13 @@ namespace LibrarySystemWebAPI.Controllers
         {
             var result = await _authService.LoginAsync(request.UserName, request.Password);
 
-            if(!result.Success || result.Token == null)
+            // Check if login was successful
+
+            if (!result.Success || result.Token == null)
             {
                 return Unauthorized(result.ErrorMessage ?? "Login failed.");
             }
+            // Set JWT as HttpOnly cookie
 
             Response.Cookies.Append("jwt", result.Token, new CookieOptions
             {
@@ -38,21 +41,26 @@ namespace LibrarySystemWebAPI.Controllers
                 SameSite = SameSiteMode.Lax,
             });
 
+            // Return token and role in response body
+
             return Ok(new { token = result.Token, role = result.Role });
         }
 
         [HttpPost("logout")]
         public IActionResult Logout()
         {
+            // Remove the JWT cookie
             Response.Cookies.Delete("jwt");
             return Ok("Logged out successfully.");
         }
         [HttpPost("signup")]
         public async Task<IActionResult> Signup([FromForm] UserDTO request)
         {
+            // Call the signup method from the auth service
             var result = await _authService.SignUpAsync(request.UserName, request.Password);
             if (!result.Success)
             {
+                // Signup failed
                 return BadRequest(result.ErrorMessage ?? "Signup failed.");
             }
             return Ok("User created successfully.");

@@ -19,12 +19,16 @@ namespace LibrarySystemWebAPI.Services
         }
         public async Task<(bool Success, string? Token, string? Role, string? ErrorMessage)> LoginAsync(string username, string password)
         {
+            // Retrieve user from the database
             var user = await _userRepository.GetByUserNameAsync(username);
-            if(user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+
+            // Verify password
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
                 return (false, null, null, "Invalid username or password.");
             }
 
+            // Generate JWT
             var claims = new List<Claim>
             {
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -40,6 +44,7 @@ namespace LibrarySystemWebAPI.Services
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             var creds = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+            // Create the token
             var token = new JwtSecurityToken(
                 issuer: issuer,
                 audience: audience,
@@ -54,12 +59,13 @@ namespace LibrarySystemWebAPI.Services
 
         public async Task<(bool Success, string? ErrorMessage)> SignUpAsync(string username, string password)
         {
+            // Check if username already exists
             var existingUser = await _userRepository.GetByUserNameAsync(username);
             if(existingUser != null)
             {
                 return (false, "Username already exists.");
             }
-
+            // Hash the password
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
             var newUser = new User
             {
@@ -67,6 +73,8 @@ namespace LibrarySystemWebAPI.Services
                 PasswordHash = hashedPassword,
                 Role = "User" // Default role
             };
+
+            // Save the new user to the database
             await _userRepository.AddAsync(newUser);
             await _userRepository.SaveAsync();
             return (true, null);

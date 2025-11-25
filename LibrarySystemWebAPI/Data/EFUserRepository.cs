@@ -23,7 +23,6 @@ namespace LibrarySystemWebAPI.Data
             if(user != null)
             {
                 _db.Users.Remove(user);
-                await _db.SaveChangesAsync();
             }
         }
 

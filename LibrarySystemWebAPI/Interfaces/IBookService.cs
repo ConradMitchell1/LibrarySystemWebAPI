@@ -24,7 +24,6 @@ namespace LibrarySystemWebAPI.Interfaces
         Task AddAsync(BookDTO book);
         Task DeleteAsync(int id);
         Task UpdateAsync(int id, BookDTO book);
-        Task<Book> GetByIdAsync(int id);
         Task<IReadOnlyList<Book>> GetAllAsync();
         Task BorrowAsync(int bookId, int userId);
         Task ReturnAsync(int bookId, int userId); 

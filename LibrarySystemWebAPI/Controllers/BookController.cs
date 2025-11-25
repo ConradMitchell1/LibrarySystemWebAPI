@@ -20,16 +20,89 @@ namespace LibrarySystemWebAPI.Controllers
             _bookService = bookService;
         }
 
+        // ------------------------------
+        // Helpers
+        // ------------------------------
+
+        private bool TryGetUserId(out int userId)
+        {
+            userId = 0;
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out userId))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        // ------------------------------
+        // Public / general book queries
+        // ------------------------------
+
         [HttpGet("available")]
+        [Authorize(Roles = "User,Admin")]
         public async Task<ActionResult<IEnumerable<Book>>> GetAvailableBooks()
         {   
             return Ok(await _bookService.GetAvailableAsync());
         }
+
+        [HttpGet("search/title")]
+        [Authorize(Roles = "User,Admin")]
+        public async Task<ActionResult<IEnumerable<Book>>> SearchByTitle([FromQuery] string q)
+        {
+            return Ok(await _bookService.SearchByTitleAsync(q));
+        }
+
+        [HttpGet("search/author")]
+        [Authorize(Roles = "User,Admin")]
+        public async Task<ActionResult<IEnumerable<Book>>> SearchByAuthor([FromQuery] string q)
+        {
+            return Ok(await _bookService.SearchByAuthorAsync(q));
+        }
+
+        [HttpGet("group-by-author")]
+        [Authorize(Roles = "User,Admin")]
+        public async Task<ActionResult> GroupByAuthor()
+        {
+            var groups = await _bookService.GroupByAuthorAsync();
+
+            var result = groups.Select(g => new { Author = g.Key, Books = g.Select(b => new { b.Id, b.Title }) });
+            return Ok(result);
+        }
+
+        // ------------------------------
+        // User-Specific actions
+        // ------------------------------
+
+        [HttpPost("borrow/{id:int}")]
+        [Authorize(Roles = "User,Admin")]
+        public async Task<IActionResult> BorrowBook(int id)
+        {   
+            if(!TryGetUserId(out var userId))
+            {
+                return Unauthorized("Invalid or missing user id claim");
+            }
+            await _bookService.BorrowAsync(id, userId);
+            return Ok();
+        }
+
+        [HttpPost("return/{id:int}")]
+        [Authorize(Roles = "User,Admin")]
+        public async Task<IActionResult> ReturnBook(int id)
+        {
+            if(!TryGetUserId(out var userId))
+            {
+                return Unauthorized("Invalid or missing user id claim");
+            }
+            await _bookService.ReturnAsync(id, userId);
+            return Ok();
+        }
+
         [HttpGet("borrowed")]
+        [Authorize(Roles = "User,Admin")]
         public async Task<ActionResult<IEnumerable<BorrowedBookDTO>>> GetUserBorrowedBooks()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
-            if(userIdClaim == null || !int.TryParse(userIdClaim.Value, out var userId))
+            if(!TryGetUserId(out var userId))
             {
                 return Unauthorized("Invalid or missing user id claim");
             }
@@ -38,58 +111,32 @@ namespace LibrarySystemWebAPI.Controllers
         }
 
         [HttpGet("find-books/{id:int}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<User>>> FindBooks(int id)
         {
             var booksBorrowedByUsers = await _bookService.FindBooksBorrowedByUsersAsync(id);
             return Ok(booksBorrowedByUsers);
         }
 
+        // ------------------------------
+        // Admin-Specific actions
+        // ------------------------------
 
-        [HttpPost("borrow/{id:int}")]
-        public async Task<IActionResult> BorrowBook(int id)
-        {   
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userId = int.Parse(userIdString);
-            await _bookService.BorrowAsync(id, userId);
-            return Ok();
-        }
-        [HttpPost("return/{id:int}")]
-        public async Task<IActionResult> ReturnBook(int id)
-        {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userId = int.Parse(userIdString);
-            await _bookService.ReturnAsync(id, userId);
-            return Ok();
-        }
+        
         [HttpGet("top-borrowed")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Book>>> GetTopBorrowedBooks()
         {
             return Ok(await _bookService.GetTopBorrowedBooksAsync());
         }
-        [HttpGet("search/title")]
-        public async Task<ActionResult<IEnumerable<Book>>> SearchByTitle([FromQuery] string q)
-        {
-            return Ok(await _bookService.SearchByTitleAsync(q));
-        }
-        [HttpGet("search/author")]
-        public async Task<ActionResult<IEnumerable<Book>>> SearchByAuthor([FromQuery] string q)
-        {
-            return Ok(await _bookService.SearchByAuthorAsync(q));
-        }
-        [HttpGet("group-by-author")]
-        public async Task<ActionResult> GroupByAuthor()
-        {
-            var groups = await _bookService.GroupByAuthorAsync();
-
-            var result = groups.Select(g => new { Author = g.Key, Books = g.Select(b => new { b.Id, b.Title }) });
-            return Ok(result);
-        }
+        
         [HttpGet("all-books")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<IEnumerable<Book>>> GetAllBooks()
         {
             return Ok(await _bookService.GetAllAsync());
         }
+
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Book>> AddBookAsync([FromBody] BookDTO newBook)
@@ -97,6 +144,7 @@ namespace LibrarySystemWebAPI.Controllers
             await _bookService.AddAsync(newBook);
             return CreatedAtAction(nameof(GetAvailableBooks), null);
         }
+
         [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateBookAsync(int id, BookDTO updatedBook)
@@ -104,6 +152,7 @@ namespace LibrarySystemWebAPI.Controllers
             await _bookService.UpdateAsync(id, updatedBook);
             return NoContent();
         }
+
         [HttpDelete("{id:int}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteBook(int id)
