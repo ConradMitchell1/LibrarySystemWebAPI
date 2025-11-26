@@ -38,20 +38,7 @@ body {
     border-color:#ffcc44;
     color: #1c1f3b;
 }
-.container {
-    opacity: 50%;
-    transition: opacity 0.4s ease-in-out;
-}
-.card {
-    opacity: 50%;
-    transition: opacity 0.4s ease-in-out;
-}
-.container:hover{
-    opacity:90%;
-}
-.card:hover{
-    opacity:90%;
-}
+
 .navbar-brand{
     color: white;
 }
