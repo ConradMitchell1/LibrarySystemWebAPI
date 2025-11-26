@@ -5,10 +5,88 @@
     <div class="bg-white shadow rounded-3 p-4 mb-4">
         <div class="text-center">
             <h1 style="font-weight: bold;" class="display-4">Welcome</h1>
-            <p> To login as an admin use these credentials: Username: admin Password: Adminpassword123</p>
+            <p class="text-muted mb-4">
+                To login as an admin use these credentials: Username: <strong>admin</strong>
+                Password: <strong>Adminpassword123</strong>
+            </p>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <div class="d-flex justify-content-center gap-3">
+                    <a asp-controller="Page" asp-action="Library" class="btn btn-primary me-2">
+                        <i class="bi bi-book-half me-1"></i> Go to Library
+                    </a>
+
+                    <a asp-controller="Page" asp-action="UserAccount" class="btn btn-primary"">
+                        <i class="bi bi-person-circle me-1"></i> My Borrowed Books
+                    </a>
+                </div>
+            }
+            else
+            {
+                <button class="btn btn-primary me-2" id="heroLoginBtn">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Log In
+                </button>
+                <button class="btn btn-primary" id="heroSignupBtn">
+                    <i class="bi bi-person-plus me-1"></i> Sign Up
+                </button>
+            }
         </div>
     </div>
 </div>
+
+<div class="row mt-4 g-4">
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-search me-2 text-warning"></i>Browse the Library
+                </h5>
+                <p class="card-text text-muted">
+                    Search by title or author, and see availability at a glance.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-bookmark-check me-2 text-warning"></i>Borrow & Return
+                </h5>
+                <p class="card-text text-muted">
+                    Borrow books with one click and manage your current loans.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-bar-chart-line me-2 text-warning"></i>Admin Insights
+                </h5>
+                <p class="card-text text-muted">
+                    Track top borrowed titles and manage the catalogue efficiently.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        const heroLoginBtn = document.getElementById('heroLoginBtn');
+        if (heroLoginBtn) {
+            heroLoginBtn.addEventListener('click', () => $('#loginModal').modal('show'));
+        }
+
+        const heroSignupBtn = document.getElementById('heroSignupBtn');
+        if (heroSignupBtn) {
+            heroSignupBtn.addEventListener('click', () => $('#signupModal').modal('show'));
+        }
+    </script>
+}
 
 
 

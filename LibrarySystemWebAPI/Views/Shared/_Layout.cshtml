@@ -51,8 +51,8 @@
                         }
                         else
                         {
-                            <button class="btn btn-primary m-1" id="loginBtn">Login</button>
-                            <button class="btn btn-primary m-1" id="signupBtn">Sign Up</button>
+                            <button class="btn btn-primary m-1" id="loginBtn"><i class="bi bi-box-arrow-in-right me-1"></i> Login</button>
+                            <button class="btn btn-primary m-1" id="signupBtn"><i class="bi bi-person-plus me-1"></i> Sign Up</button>
                         }
                     </div>
                 </div>
@@ -146,6 +146,22 @@
 
     @await RenderSectionAsync("Scripts", required: false)
         <script>
+            function setButtonLoading(button, isLoading, textWhenDone){
+                if(!button) return;
+
+                if(isLoading){
+                    button.disabled = true;
+                    button.dataset.originalText = button.innerHTML;
+                    button.innerHTML =`
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span class="ms-2">Loading...</span>
+                    `;
+                } else{
+                    button.disabled = false;
+                    button.innerHTML = textWhenDone || button.dataset.originalText || 'Submit';
+                }
+
+            }
             async function logout(){
                 await fetch('/api/Auth/logout', {
                     method: 'POST',
@@ -157,46 +173,63 @@
 
             async function login(){
                 const apiLogin = '/api/Auth/login'
+                const logBtn = document.getElementById('logBtn');
                 const payload = {
                     username: document.getElementById("logUsername").value,
                     password: document.getElementById("logPassword").value
                 };
-                const response = await fetch(apiLogin, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload),
-                });
-                if(!response.ok){
-                    const text = await response.text();
-                    alert('Error Logging in: ' + text);
-                    return;
+
+                setButtonLoading(logBtn, true, 'Log In');
+                try{
+                    const response = await fetch(apiLogin, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload),
+                    });
+                    if(!response.ok){
+                        const text = await response.text();
+                        alert('Error Logging in: ' + text);
+                        return;
+                    }
+                    $('#loginModal').modal('hide');
+                    window.location.reload();
+
+                } finally{
+                    setButtonLoading(logBtn, false, 'Log in');
                 }
-                $('#loginModal').modal('hide');
-                window.location.reload();
+                
             }
 
             async function signup(){
                 const apiSignup = '/api/Auth/signup'
+                const signBtn = document.getElementById('signBtn');
                 const payload = {
                     username: document.getElementById("signUsername").value,
                     password: document.getElementById("signPassword").value
                 };
-                const response = await fetch(apiSignup, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload),
-                });
-                if(!response.ok){
-                    const text = await response.text();
-                    alert('Error Signing Up: ' + text);
-                    return;
+                setButtonLoading(signBtn, true, 'Sign Up');
+                try{
+                    const response = await fetch(apiSignup, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload),
+                    });
+                    if(!response.ok){
+                        const text = await response.text();
+                        alert('Error Signing Up: ' + text);
+                        return;
+                    }
+                    $('#signupModal').modal('hide');
+                    window.location.reload();
+
+                } finally{
+                    setButtonLoading(signBtn, false, 'Sign Up');
                 }
-                $('#signupModal').modal('hide');
-                window.location.reload();
+                
             }
 
             document.getElementById("toggleLogPassword").addEventListener("click", function () {
