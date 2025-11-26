@@ -18,5 +18,29 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background: radial-gradient(circle at top, #3e4a9a 0, #34386b 45%, #262a56 100%);
+}
+.nav-link.active {
+    border-bottom: 3px solid #ffcc44;
+    color: #ffffff;
+    font-weight: 600;
+}
+.nav-link{
+    color:white;
+}
+.nav-link:hover {
+    border-bottom: 3px solid #ffcc44;
+    color: #ffcc44;
+}
+.btn-primary:hover{
+    background-color: #ffcc44;
+    border-color:#ffcc44;
+    color: #1c1f3b;
+}
+.navbar-brand{
+    color: white;
+}
+.navbar-brand:hover {
+    color: #ffcc44;
 }

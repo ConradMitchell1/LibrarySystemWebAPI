@@ -2,12 +2,17 @@
     ViewData["Title"] = "Borrowers";
     var bookId = (int)ViewBag.BookId;
 }
-<button class="DeleteBook btn btn-primary m-1" data-id="@bookId">Delete</button>
-<h1> Borrowers for Book @bookId </h1>
+<div class="container py-4">
+    <div class="bg-white shadow rounded-3 p-4 mb-4">
+        <button class="DeleteBook btn btn-primary m-1" data-id="@bookId">Delete</button>
+        <h1> Borrowers for Book @bookId </h1>
 
-<div id="usersBorrowedContainer">
-    <p>Loading users..</p>
+        <div id="usersBorrowedContainer">
+            <p>Loading users..</p>
+        </div>
+    </div>
 </div>
+
 
 @section Scripts {
     <script>

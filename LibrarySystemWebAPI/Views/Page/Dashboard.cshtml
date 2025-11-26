@@ -1,50 +1,58 @@
-﻿<h1> All Books </h1>
-<a class="btn btn-primary m-1" asp-area="" asp-controller="Page" asp-action="TopBorrowed">Top Borrowed Books</a>
-<button class="btn btn-primary m-1" id="addBookBtn">Add Book</button>
-<div id="booksContainer">
-    <p>Loading books..</p>
-</div>
-<div class="modal fade" id="editBookModal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Book</h5>
-                <button type="button" class="close" data-bs-dismiss="modal">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Id -->
-                <input type="hidden" id="editBookId" />
-                <div class="form-group">
-                    <label for="editTitle">Title</label>
-                    <input type="text" class="form-control" id="editTitle" />
-                </div>
-
-                <div class="form-group">
-                    <label for="editAuthor">Author</label>
-                    <input type="text" class="form-control" id="editAuthor" />
-                </div>
-                <div class="form-group">
-                    <label for="editIsbn">ISBN</label>
-                    <input type="text" class="form-control" id="editIsbn" />
-                </div>
-                <div class="form-group">
-                    <label for="editCopies">Copies Available</label>
-                    <input type="text" class="form-control" id="editCopies" />
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveEditBtn">Save changes</button>
-            </div>
-
-            
+﻿
+<div class="container py-4">
+    <div class="bg-white shadow rounded-3 p-4 mb-4">
+        <h1> All Books </h1>
+        <a class="btn btn-primary m-1" asp-area="" asp-controller="Page" asp-action="TopBorrowed">Top Borrowed Books</a>
+        <button class="btn btn-primary m-1" id="addBookBtn">Add Book</button>
+        <div id="booksContainer">
+            <p>Loading books..</p>
         </div>
-    </div>
+        <div class="modal fade" id="editBookModal">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Book</h5>
+                        <button type="button" class="close" data-bs-dismiss="modal">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Id -->
+                        <input type="hidden" id="editBookId" />
+                        <div class="form-group">
+                            <label for="editTitle">Title</label>
+                            <input type="text" class="form-control" id="editTitle" />
+                        </div>
 
+                        <div class="form-group">
+                            <label for="editAuthor">Author</label>
+                            <input type="text" class="form-control" id="editAuthor" />
+                        </div>
+                        <div class="form-group">
+                            <label for="editIsbn">ISBN</label>
+                            <input type="text" class="form-control" id="editIsbn" />
+                        </div>
+                        <div class="form-group">
+                            <label for="editCopies">Copies Available</label>
+                            <input type="text" class="form-control" id="editCopies" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="saveEditBtn">Save changes</button>
+                    </div>
+
+
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
     
 </div>
+
 <div class="modal fade" id="addBookModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">

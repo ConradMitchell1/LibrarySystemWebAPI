@@ -1,21 +1,26 @@
-﻿<h1> Library </h1>
-<form id="searchForm" class="mb-3">
-    <div class="input-group">
-        <input id="searchInput" type="text" class="form-control" placeholder="Search books..."/>
-        <select id="searchType" class="form-select" style="max-width: 140px;">
-            <option value="title">Title</option>
-            <option value="author">Author</option>
-        </select>
+﻿<div class="container py-4">
+    <div class="bg-white shadow rounded-3 p-4 mb-4">
+        <h1> Library </h1>
+        <form id="searchForm" class="mb-3">
+            <div class="input-group">
+                <input id="searchInput" type="text" class="form-control" placeholder="Search books..." />
+                <select id="searchType" class="form-select" style="max-width: 140px;">
+                    <option value="title">Title</option>
+                    <option value="author">Author</option>
+                </select>
 
-        <button class="btn btn-primary" type="submit">Search</button>
-        <button class="btn btn-outline-secondary" type="button" id="clearSearch">
-            Clear
-        </button>
+                <button class="btn btn-primary" type="submit">Search</button>
+                <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                    Clear
+                </button>
+            </div>
+        </form>
+        <div id="booksContainer">
+            <p>Loading books..</p>
+        </div>
     </div>
-</form>
-<div id="booksContainer"> 
-    <p>Loading books..</p>
 </div>
+
 
 @section Scripts {
     <script>
